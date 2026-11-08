@@ -15,9 +15,13 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Create an asynchronous function for fetching dog data
   const fetchDogs = async () => {
     try {
+
+      // Request 10 random dog images from the public API
+      const response = await fetch(
+        'https://dog.ceo/api/breeds/image/random/10'
+      );
 
     } catch (error) {
       setError(error.message);

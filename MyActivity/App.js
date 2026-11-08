@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  Image,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
   SafeAreaView,
 } from 'react-native';
 

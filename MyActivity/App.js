@@ -18,10 +18,20 @@ export default function App() {
   const fetchDogs = async () => {
     try {
 
-      // Request 10 random dog images from the public API
       const response = await fetch(
         'https://dog.ceo/api/breeds/image/random/10'
       );
+
+      // Check whether the API request succeeded
+      if (!response.ok) {
+        throw new Error('Failed to fetch dog images.');
+      }
+
+      // Convert the response into JSON
+      const result = await response.json();
+
+      // Save the returned image URLs
+      setDogs(result.message);
 
     } catch (error) {
       setError(error.message);

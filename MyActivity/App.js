@@ -40,12 +40,28 @@ export default function App() {
     fetchDogs();
   }, []);
 
-  return (
-    <SafeAreaView>
+return (
+  <SafeAreaView>
+    <View>
+      <Text>🐶 Random Dog Gallery</Text>
+      <Text>Discover adorable dogs from around the world!</Text>
+    </View>
+
+    {loading ? (
+      // Show while waiting for API data
       <View>
-        <Text>🐶 Random Dog Gallery</Text>
-        <Text>Discover adorable dogs from around the world!</Text>
+        <ActivityIndicator size="large" color="#6C63FF" />
+        <Text>Loading dog images...</Text>
       </View>
-    </SafeAreaView>
-  );
+    ) : error ? (
+      // Show if the request fails
+      <View>
+        <Text>Error: {error}</Text>
+      </View>
+    ) : (
+      // Dog images will be displayed here
+      <Text>Dog images loaded successfully!</Text>
+    )}
+  </SafeAreaView>
+);
 }

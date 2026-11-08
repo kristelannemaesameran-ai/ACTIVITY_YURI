@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   StatusBar,
+  Pressable,
 } from 'react-native';
 
 import {
@@ -15,7 +16,12 @@ import {
   SafeAreaView,
 } from 'react-native-safe-area-context';
 
-export default function App() {
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Stack = createNativeStackNavigator();
+
+function HomeScreen({ navigation }) {
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -46,75 +52,133 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <StatusBar backgroundColor="#FFF0F5" barStyle="dark-content" />
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      <StatusBar backgroundColor="#FFF0F5" barStyle="dark-content" />
 
-        <View style={styles.header}>
-          <Text style={styles.emoji}>🐶</Text>
-          <Text style={styles.title}>Puppy Gallery</Text>
-          <Text style={styles.subtitle}>
-            A little happiness in every picture
+      <View style={styles.header}>
+        <Text style={styles.emoji}>🐶</Text>
+        <Text style={styles.title}>Puppy Gallery</Text>
+        <Text style={styles.subtitle}>
+          A little happiness in every picture
+        </Text>
+
+        <View style={styles.countContainer}>
+          <Text style={styles.countText}>
+            {dogs.length} Adorable Puppies
           </Text>
+        </View>
+      </View>
 
-          <View style={styles.countContainer}>
-            <Text style={styles.countText}>
-              {dogs.length} Adorable Puppies
-            </Text>
-          </View>
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#E75480" />
+          <Text style={styles.message}>
+            Finding adorable puppies...
+          </Text>
         </View>
 
-        {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color="#E75480" />
-            <Text style={styles.message}>
-              Finding adorable puppies...
-            </Text>
-          </View>
+      ) : error ? (
+        <View style={styles.center}>
+          <Text style={styles.error}>Oops! {error}</Text>
+        </View>
 
-        ) : error ? (
-          <View style={styles.center}>
-            <Text style={styles.error}>Oops! {error}</Text>
-          </View>
+      ) : (
+        <FlatList
+          data={dogs}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <Pressable
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate('DogDetails', {
+                  image: item,
+                  number: index + 1,
+                })
+              }
+            >
+              <Image
+                source={{ uri: item }}
+                style={styles.image}
+                resizeMode="cover"
+              />
 
-        ) : (
-          <FlatList
-            data={dogs}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={styles.list}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => (
-              <View style={styles.card}>
-                <Image
-                  source={{ uri: item }}
-                  style={styles.image}
-                  resizeMode="cover"
-                />
-
-                <View style={styles.cardFooter}>
-                  <View>
-                    <Text style={styles.dogName}>
-                      Lovely Puppy #{index + 1}
-                    </Text>
-                    <Text style={styles.dogSubtitle}>
-                      Made with love ♡
-                    </Text>
-                  </View>
-
-                  <Text style={styles.heart}>♥</Text>
+              <View style={styles.cardFooter}>
+                <View>
+                  <Text style={styles.dogName}>
+                    Lovely Puppy #{index + 1}
+                  </Text>
+                  <Text style={styles.dogSubtitle}>
+                    Tap to see full image
+                  </Text>
                 </View>
+
+                <Text style={styles.heart}>♥</Text>
               </View>
-            )}
+            </Pressable>
+          )}
+        />
+      )}
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Made with ♡ for dog lovers
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function DogDetailsScreen({ route }) {
+  const { image, number } = route.params;
+
+  return (
+    <SafeAreaView style={styles.detailsContainer} edges={['top', 'bottom']}>
+      <StatusBar backgroundColor="#FFF0F5" barStyle="dark-content" />
+
+      <Text style={styles.detailsTitle}>
+        Lovely Puppy #{number} ♡
+      </Text>
+
+      <Image
+        source={{ uri: image }}
+        style={styles.fullImage}
+        resizeMode="contain"
+      />
+
+      <Text style={styles.detailsSubtitle}>
+        A little happiness in every picture!
+      </Text>
+    </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: { backgroundColor: '#FFD6E5' },
+            headerTintColor: '#C2185B',
+            headerTitleStyle: { fontWeight: 'bold' },
+            headerShadowVisible: false,
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ headerShown: false }}
           />
-        )}
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Made with ♡ for dog lovers
-          </Text>
-        </View>
-
-      </SafeAreaView>
+          <Stack.Screen
+            name="DogDetails"
+            component={DogDetailsScreen}
+            options={{ title: 'Dog Details' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }
@@ -240,5 +304,33 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#C45B80',
     fontWeight: '600',
+  },
+
+  detailsContainer: {
+    flex: 1,
+    backgroundColor: '#FFF0F5',
+    padding: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  detailsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#D6336C',
+    marginBottom: 25,
+  },
+
+  fullImage: {
+    width: '100%',
+    height: '65%',
+    borderRadius: 20,
+    backgroundColor: '#FFD6E5',
+  },
+
+  detailsSubtitle: {
+    fontSize: 14,
+    color: '#B84D75',
+    marginTop: 20,
   },
 });

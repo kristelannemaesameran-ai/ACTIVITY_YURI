@@ -10,6 +10,16 @@ import {
 } from 'react-native';
 
 export default function App() {
+
+  // Store the fetched dog images
+  const [dogs, setDogs] = useState([]);
+
+  // Track the loading status
+  const [loading, setLoading] = useState(true);
+
+  // Store possible error messages
+  const [error, setError] = useState('');
+
   return (
     <SafeAreaView>
       <View>

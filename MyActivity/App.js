@@ -7,125 +7,102 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
 
+import {
+  SafeAreaProvider,
+  SafeAreaView,
+} from 'react-native-safe-area-context';
+
 export default function App() {
-
-  // Store the dog images received from the API
   const [dogs, setDogs] = useState([]);
-
-  // Track whether the API is still loading
   const [loading, setLoading] = useState(true);
-
-  // Store an error message if the request fails
   const [error, setError] = useState('');
 
-  // Function for retrieving random dog images
   const fetchDogs = async () => {
     try {
-
-      // Send a GET request to the Dog CEO API
       const response = await fetch(
         'https://dog.ceo/api/breeds/image/random/10'
       );
 
-      // Check if the API request was successful
       if (!response.ok) {
         throw new Error('Failed to fetch dog images.');
       }
 
-      // Convert the API response into JavaScript data
       const result = await response.json();
-
-      // Save the returned dog image URLs
       setDogs(result.message);
 
     } catch (error) {
-
-      // Handle errors during the API request
       setError(error.message);
 
     } finally {
-
-      // Stop loading after the request finishes
       setLoading(false);
     }
   };
 
-  // Fetch dog images automatically when the app opens
   useEffect(() => {
     fetchDogs();
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaProvider>
+      <SafeAreaView
+        style={styles.container}
+        edges={['top', 'bottom', 'left', 'right']}
+      >
+        <Text style={styles.title}>
+          🐶 Random Dog Gallery
+        </Text>
 
-      {/* Application heading */}
-      <Text style={styles.title}>
-        🐶 Random Dog Gallery
-      </Text>
+        <Text style={styles.subtitle}>
+          Discover adorable dogs from around the world!
+        </Text>
 
-      <Text style={styles.subtitle}>
-        Discover adorable dogs from around the world!
-      </Text>
+        {loading ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#6C63FF" />
+            <Text style={styles.message}>
+              Loading dog images...
+            </Text>
+          </View>
 
-      {/* Check the current API request status */}
-      {loading ? (
+        ) : error ? (
+          <View style={styles.center}>
+            <Text style={styles.error}>
+              Error: {error}
+            </Text>
+          </View>
 
-        // Loading indicator
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color="#6C63FF" />
-          <Text style={styles.message}>
-            Loading dog images...
-          </Text>
-        </View>
+        ) : (
+          <FlatList
+            data={dogs}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.list}
+            renderItem={({ item, index }) => (
+              <View style={styles.card}>
+                <Image
+                  source={{ uri: item }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
 
-      ) : error ? (
-
-        // Error message
-        <View style={styles.center}>
-          <Text style={styles.error}>
-            Error: {error}
-          </Text>
-        </View>
-
-      ) : (
-
-        // Display the fetched dog images
-        <FlatList
-          data={dogs}
-          keyExtractor={(item, index) => index.toString()}
-          contentContainerStyle={styles.list}
-          renderItem={({ item, index }) => (
-            <View style={styles.card}>
-
-              <Image
-                source={{ uri: item }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-
-              <Text style={styles.dogName}>
-                Dog #{index + 1}
-              </Text>
-
-            </View>
-          )}
-        />
-      )}
-
-    </SafeAreaView>
+                <Text style={styles.dogName}>
+                  Dog #{index + 1}
+                </Text>
+              </View>
+            )}
+          />
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
-// Application layout and visual design
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#F4F1FF',
-    padding: 15,
+    paddingHorizontal: 15,
   },
 
   title: {
@@ -187,5 +164,4 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 5,
   },
-
 });

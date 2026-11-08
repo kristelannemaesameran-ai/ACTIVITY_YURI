@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  StatusBar,
 } from 'react-native';
 
 import {
@@ -46,31 +47,34 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView
-        style={styles.container}
-        edges={['top', 'bottom', 'left', 'right']}
-      >
-        <Text style={styles.title}>
-          🐶 Random Dog Gallery
-        </Text>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <StatusBar backgroundColor="#FFF0F5" barStyle="dark-content" />
 
-        <Text style={styles.subtitle}>
-          Discover adorable dogs from around the world!
-        </Text>
+        <View style={styles.header}>
+          <Text style={styles.emoji}>🐶</Text>
+          <Text style={styles.title}>Puppy Gallery</Text>
+          <Text style={styles.subtitle}>
+            A little happiness in every picture
+          </Text>
+
+          <View style={styles.countContainer}>
+            <Text style={styles.countText}>
+              {dogs.length} Adorable Puppies
+            </Text>
+          </View>
+        </View>
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color="#6C63FF" />
+            <ActivityIndicator size="large" color="#E75480" />
             <Text style={styles.message}>
-              Loading dog images...
+              Finding adorable puppies...
             </Text>
           </View>
 
         ) : error ? (
           <View style={styles.center}>
-            <Text style={styles.error}>
-              Error: {error}
-            </Text>
+            <Text style={styles.error}>Oops! {error}</Text>
           </View>
 
         ) : (
@@ -78,6 +82,7 @@ export default function App() {
             data={dogs}
             keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
             renderItem={({ item, index }) => (
               <View style={styles.card}>
                 <Image
@@ -86,13 +91,29 @@ export default function App() {
                   resizeMode="cover"
                 />
 
-                <Text style={styles.dogName}>
-                  Dog #{index + 1}
-                </Text>
+                <View style={styles.cardFooter}>
+                  <View>
+                    <Text style={styles.dogName}>
+                      Lovely Puppy #{index + 1}
+                    </Text>
+                    <Text style={styles.dogSubtitle}>
+                      Made with love ♡
+                    </Text>
+                  </View>
+
+                  <Text style={styles.heart}>♥</Text>
+                </View>
               </View>
             )}
           />
         )}
+
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Made with ♡ for dog lovers
+          </Text>
+        </View>
+
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -101,23 +122,46 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F1FF',
-    paddingHorizontal: 15,
+    backgroundColor: '#FFF0F5',
+    paddingHorizontal: 18,
+  },
+
+  header: {
+    alignItems: 'center',
+    paddingTop: 15,
+    paddingBottom: 20,
+  },
+
+  emoji: {
+    fontSize: 42,
+    marginBottom: 5,
   },
 
   title: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#5145A5',
-    marginTop: 15,
+    fontSize: 29,
+    fontWeight: '900',
+    color: '#D6336C',
+    letterSpacing: 0.5,
   },
 
   subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    color: '#666',
-    marginVertical: 10,
+    fontSize: 13,
+    color: '#B84D75',
+    marginTop: 5,
+  },
+
+  countContainer: {
+    backgroundColor: '#FFD6E5',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginTop: 15,
+  },
+
+  countText: {
+    color: '#C2185B',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 
   center: {
@@ -127,41 +171,74 @@ const styles = StyleSheet.create({
   },
 
   message: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#5145A5',
+    marginTop: 12,
+    fontSize: 15,
+    color: '#D6336C',
+    fontWeight: '600',
   },
 
   error: {
-    color: 'red',
-    fontSize: 16,
+    color: '#C2185B',
+    fontSize: 15,
     textAlign: 'center',
   },
 
   list: {
-    paddingBottom: 20,
+    paddingBottom: 15,
   },
 
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 20,
     padding: 10,
-    marginVertical: 8,
-    elevation: 3,
+    marginBottom: 18,
+    elevation: 4,
+    shadowColor: '#D6336C',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
 
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 10,
+    height: 210,
+    borderRadius: 14,
+    backgroundColor: '#FFD6E5',
+  },
+
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 10,
   },
 
   dogName: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#5145A5',
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 5,
+    color: '#C2185B',
+  },
+
+  dogSubtitle: {
+    fontSize: 11,
+    color: '#D88AA5',
+    marginTop: 3,
+  },
+
+  heart: {
+    fontSize: 25,
+    color: '#E75480',
+  },
+
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+
+  footerText: {
+    fontSize: 11,
+    color: '#C45B80',
+    fontWeight: '600',
   },
 });

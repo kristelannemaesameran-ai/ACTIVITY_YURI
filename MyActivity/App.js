@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -11,10 +12,16 @@ import {
 
 export default function App() {
 
+  // Store the dog images received from the API
   const [dogs, setDogs] = useState([]);
+
+  // Track the loading status
   const [loading, setLoading] = useState(true);
+
+  // Store possible error messages
   const [error, setError] = useState('');
 
+  // Fetch dog images from the public API
   const fetchDogs = async () => {
     try {
       const response = await fetch(
@@ -26,6 +33,8 @@ export default function App() {
       }
 
       const result = await response.json();
+
+      // Save the fetched image URLs
       setDogs(result.message);
 
     } catch (error) {
@@ -35,33 +44,130 @@ export default function App() {
     }
   };
 
-  // Fetch data once when the component mounts
+  // Automatically fetch data when the app opens
   useEffect(() => {
     fetchDogs();
   }, []);
 
-return (
-  <SafeAreaView>
-    <View>
-      <Text>🐶 Random Dog Gallery</Text>
-      <Text>Discover adorable dogs from around the world!</Text>
-    </View>
+  return (
+    <SafeAreaView style={styles.container}>
 
-    {loading ? (
-      // Show while waiting for API data
-      <View>
-        <ActivityIndicator size="large" color="#6C63FF" />
-        <Text>Loading dog images...</Text>
-      </View>
-    ) : error ? (
-      // Show if the request fails
-      <View>
-        <Text>Error: {error}</Text>
-      </View>
-    ) : (
-      // Dog images will be displayed here
-      <Text>Dog images loaded successfully!</Text>
-    )}
-  </SafeAreaView>
-);
+      <Text style={styles.title}>
+        🐶 Random Dog Gallery
+      </Text>
+
+      <Text style={styles.subtitle}>
+        Discover adorable dogs from around the world!
+      </Text>
+
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#6C63FF" />
+          <Text style={styles.message}>
+            Loading dog images...
+          </Text>
+        </View>
+
+      ) : error ? (
+        <View style={styles.center}>
+          <Text style={styles.error}>
+            Error: {error}
+          </Text>
+        </View>
+
+      ) : (
+        // Display all fetched dog images
+        <FlatList
+          data={dogs}
+          keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={styles.list}
+          renderItem={({ item, index }) => (
+            <View style={styles.card}>
+
+              <Image
+                source={{ uri: item }}
+                style={styles.image}
+                resizeMode="cover"
+              />
+
+              <Text style={styles.dogName}>
+                Dog #{index + 1}
+              </Text>
+
+            </View>
+          )}
+        />
+      )}
+
+    </SafeAreaView>
+  );
 }
+
+// Basic styling for the gallery
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F4F1FF',
+    padding: 15,
+  },
+
+  title: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#5145A5',
+    marginTop: 15,
+  },
+
+  subtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#666',
+    marginVertical: 10,
+  },
+
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  message: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#5145A5',
+  },
+
+  error: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
+  list: {
+    paddingBottom: 20,
+  },
+
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 10,
+    marginVertical: 8,
+    elevation: 3,
+  },
+
+  image: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+  },
+
+  dogName: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#5145A5',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 5,
+  },
+});
